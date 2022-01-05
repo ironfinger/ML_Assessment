@@ -1,5 +1,6 @@
 #%% 
 import os
+from numpy.core.fromnumeric import size
 import pandas as pd
 
 dataset_path = os.path.join('data', 'polyRegression.csv')
@@ -38,6 +39,8 @@ plt.show()
 # %%
 
 # Attempt the polynomial regression:
+
+import numpy as np
 
 """
 Polynomial regression related vocabulary:
@@ -78,5 +81,31 @@ n is the degree of the polynomial ( the high n is, the more complex curved lines
 
 """
 
+from sklearn.preprocessing import PolynomialFeatures
 
+poly = PolynomialFeatures(degree=2, include_bias=False)
 
+x = np.array(X_train)
+
+# This created the x values and x^2 values if you refer to the equation this is what we want.
+poly_features = poly.fit_transform(x.reshape(-1, 1))
+print(poly_features)
+
+# Creating the regression model:
+from sklearn.linear_model import LinearRegression
+poly_reg_model = LinearRegression() # We use this because it is a linear model.
+
+poly_reg_model.fit(poly_features, Y_train) # This is the model training.
+
+y_predicted = poly_reg_model.predict(poly_features)
+print(y_predicted)
+
+# %%
+
+# Data visualisation:
+plt.figure(figsize=(10, 6))
+plt.title("Poly", size=16)
+plt.scatter(x, Y_train)
+plt.plot(x, y_predicted, c="red")
+plt.show()
+# %%
