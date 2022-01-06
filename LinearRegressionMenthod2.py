@@ -73,3 +73,7 @@ plt.scatter(X, Y, color='black')
 plt.plot(list(range(0, 100)), [m * x + b for x in range(0, 100)], color='red')
 plt.show()
 # %%
+
+"""
+Attempt 2:
+"""
