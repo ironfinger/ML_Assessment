@@ -89,8 +89,63 @@ class_names = ['Patient', 'Control']
 # Two hidden layers each with 500 neurons sigmoid 
 # for hidden layers and logistic function for output
 
-import tensorflow as tf
-from tensorflow import keras 
+# Split the data set:
+train_df, test_df = train_test_split(dataset, test_size=0.1)
+test_df = test_df.reset_index(drop=True, inplace=False)
+train_df = train_df.reset_index(drop=True, inplace=False)
 
+train_x = train_df[['Alpha', 'Beta', 'Lambda1', 'Lambda2']]
+train_y = train_df[['Participant Condition']]
+
+train_x.head()
+
+#%%
+train_x.to_numpy()
+
+# %%
+
+import tensorflow as tf
+from tensorflow import keras
+
+model = keras.models.Sequential([
+    keras.layers.Flatten(input_shape=[4]),
+    keras.layers.Dense(500, activation='relu'),
+    keras.layers.Dense(500, activation='relu'),
+    keras.layers.Dense(2, activation='softmax')
+])
+
+model.compile(
+    loss='sparse_categorical_crossentropy',
+    optimizer='sgd',
+    metrics=['accuracy']
+)
+
+
+
+
+# %%
+
+import numpy as np
+train_x_np = train_x.to_numpy()
+train_y_np = train_y.to_numpy()
+train_y_np_r = np.reshape(train_y_np, (-1, len(train_y_np)))
+train_y_np = train_y_np_r[0]
+print(train_y_np)
+
+#%%
+# from sklearn import preprocessing
+# le = preprocessing.LabelEncoder()
+# train_y = le.fit(train_y)
+from sklearn import preprocessing
+le = preprocessing.LabelEncoder()
+le.fit(train_y_np)
+train_y_np = le.transform(train_y_np)
+
+print(train_y_np)
+
+#%%
+
+history = model.fit(train_x_np, train_y_np, epochs=30)
+# %%
 
 
