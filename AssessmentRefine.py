@@ -87,7 +87,6 @@ plt.show()
 # %%
 from sklearn.model_selection import train_test_split
 # Compute errors:
-
 # Step 01: Split the training data:
 train_df, test_df = train_test_split(data_frame, test_size=0.3)
 

@@ -2,11 +2,15 @@
 import numpy as np
 from numpy.core.fromnumeric import size
 import pandas as pd
-from sklearn.utils import shuffle
+import os
 
-data = pd.read_csv('dog_breeds.csv')
+path = os.path.join('dog_breeds.csv')
+
+data = pd.read_csv(path)
 easy_D = pd.read_csv('kmeans.csv', header = None)
+
 data.head()
+
 
 # %%
 
@@ -38,13 +42,14 @@ def kmeans(dataset, k):
 
     # Initialise centroids:
     centroids = initialise_centroids(dataset=dataset, k=k) # WORKING
-    
+    print('Centroids: ', centroids)
     # So now that we have initialised the centroids, we need to go through the dataset and measer the distance:
     data_matrix = dataset.values
     
     # We need a way to store the ground values:
     cluster_assigned = np.zeros((len(data_matrix), 2))
 
+    # Loop through each point in the data_matrix
     for v_index, vector in enumerate(data_matrix):
         centroid_distances = np.zeros(len(centroids))
 
@@ -65,11 +70,19 @@ def kmeans(dataset, k):
     temp_df['label_kmeans'] = cluster_assigned[:, 1]
 
     new_centroids = np.zeros([k, len(centroids[0])])
+    print('New centroids: ', new_centroids)
 
+    print('MEAN')
+    
     for i, centroid in enumerate(centroids):
 
+        print('Centroid: ', centroid)
+        
         # Get rid of the label:
         centroid_withoutk = centroid[:-1]
+        
+        print('Centroid without k: ', centroid_withoutk)
+        
         group = temp_df[temp_df['label_kmeans'] == i]
         new_centroids[i, (len(centroids[0]) - 1)] = i
 
@@ -82,13 +95,6 @@ def kmeans(dataset, k):
             new_centroids[i, x] = mean
 
     return centroids, new_centroids, cluster_assigned
-
-
-
-centroids, mean_c, cluster_assigned = kmeans(dataset=data, k=2)
-
-
-
 
 
 #%%
