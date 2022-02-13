@@ -3,12 +3,15 @@ import numpy as np
 import pandas as pd
 import os
 
+from sklearn import cluster
+
 path = os.path.join('dog_breeds.csv')
 
 data = pd.read_csv(path)
-data.head()
 easy_D = pd.read_csv('kmeans.csv', header = None)
 
+#%%
+data.head()
 #%%
 
 def compute_euclidean_distance(vec_1, vec_2):
@@ -38,12 +41,11 @@ def initialise_centroids(dataset, k):
 
 
 def kmeans(dataset, k):
+    # Step 01: Creation of variable K is done in method call.
     
     # Initialisation:
     data_m = dataset.values # Store the entire dataset in a matrix.
     cluster_assigned = np.zeros((len(data_m), 2)) # Stores the assigned cluster and the distance. 
-    
-    # Step 01: Creation of variable K is done in method call.
     
     # Step 02: Randomly select 3 distinct centroids:
     centroids = initialise_centroids(dataset=dataset, k=k)
@@ -64,16 +66,103 @@ def kmeans(dataset, k):
         
         cluster_assigned[v_index] = np.array([min_distance, assigned_cluster])
         
-    # Step 05: Calculate the mean of each cluster as the new centroids:
-    
     # Create a new df with the assigned cluster as a new column:
-    cluster_assigned_df = pd.DataFrame(data=dataset) 
+    cluster_assigned_df = dataset.copy()
+    cluster_assigned_df['assigned_centroid'] = cluster_assigned[:, 1]
     
-    print(cluster_assigned)
+    # Step 05: Calculate the mean of each cluster as the new centroids:
+    new_centroids = np.zeros([k, len(centroids[0])]) # Create an empty array to store the new centroids.
     
-    print(centroids)
-    print(cluster_assigned_df)
+    print('mean centroids')
+    for centroid_i, centroid in enumerate(centroids):
+        
+        # Copy the cluster assigned df to we don't make changes to both dataframes.
+        current_centroid = cluster_assigned_df.copy() # By current centroid we mean current group or 'k'
+        
+        # Select all the rows where the assigned centroid is equal to the current centroid being assessed.
+        current_centroid = current_centroid[current_centroid['assigned_centroid'] == centroid_i]
+        
+        # Next we need to drop the assigned_centroid column to calculate the mean centroid in that group:
+        current_centroid = current_centroid.drop(['assigned_centroid'], axis=1)
+        
+        # Next I pu the current centroid group into a numpy matrix:
+        current_group_np = current_centroid.values
+        
+        
+        # Next we need to somehow update the centroid with the mean of each cluster,
+        # I assume this is calculating the mean of each column to gather new coordiantes,
+        # Lets try:
+        for x, val in enumerate(centroid):            
+            # Get the currently column in question:
+            current_column = current_group_np[:, x]
+            mean = np.mean(current_column)
+            new_centroids[centroid_i, x] = mean
+        
+    return centroids, new_centroids, cluster_assigned_df
 
 #%%
-kmeans(dataset=data, k=2)
+centroids, mean_centroids, cluster_assigned_df = kmeans(dataset=data, k=2)
+
+print('centroids: ', centroids)
+print('Mean centroids: ', mean_centroids)
+print('Cluster assigned df: ', cluster_assigned_df)
+
+# %%
+
+# Time to plot the graphs:
+k_means_1 = cluster_assigned_df[cluster_assigned_df['assigned_centroid'] == 0]
+k_means_2 = cluster_assigned_df[cluster_assigned_df['assigned_centroid'] == 1]
+
+import matplotlib.pyplot as plt
+
+# PLot the graph:
+
+# Plot the first group:
+plt.scatter(
+    k_means_1['height'],
+    k_means_1['tail length'],
+    color='blue'
+)
+
+# Plot the second group:
+plt.scatter(
+    k_means_2['height'],
+    k_means_2['tail length'],
+    color='red'
+)
+
+# Plot the first centroids height = [0] tail length = [1]:
+plt.scatter(
+    centroids[0, 0],
+    centroids[0, 1],
+    color='black'
+)
+
+# Plot the second centroid:
+plt.scatter(
+    centroids[1, 0],
+    centroids[1, 1],
+    color='black'
+)
+
+# Plot the first mean centroid:
+plt.scatter(
+    mean_centroids[0, 0],
+    mean_centroids[1, 1],
+    color='yellow'
+)
+
+# Plot the mean centroids:
+plt.scatter(
+    mean_centroids[1, 0],
+    mean_centroids[1, 1,],
+    color='yellow'
+)
+
+plt.show()
+
+
+
+
+
 # %%
