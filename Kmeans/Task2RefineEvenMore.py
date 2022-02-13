@@ -117,6 +117,7 @@ def kmeans(dataset, k):
         
     return centroids, new_centroids, cluster_assigned_df
 
+"""Does Convergence !!!!"""
 def kmeansV2(dataset, k):
     # Step 01: Creation of variable K is done in method call.
     
@@ -140,13 +141,12 @@ def kmeansV2(dataset, k):
     # Assign the mean centroids to become the new centroids:
     centroids = new_centroids
     
-    epochs = 10
+    convergence = False
+    epochs = 100
     cycle = 0
     
     print('Starting while loop')
     for i in range(0, epochs):
-        
-        
         
         print('Current cylce: ', i)
         
@@ -159,19 +159,17 @@ def kmeansV2(dataset, k):
         
         # Step 05: Calculate the mean of each cluster as the new centroids:
         new_centroids = compute_mean_centroids(cluster_assigned_df=cluster_assigned_df, centroids=centroids, k=k)
-        
-        # # Now we need to check for changes:
-        # if new_centroids == centroids:
-        #     centroids = new_centroids
-        #     cylce = 10
+    
+        # Now we need to check if the centroids are equal:
+        if np.array_equal(centroids, new_centroids):
+            print('CONVERGENCE: ')
+            print('Originals: ', centroids)
+            print('New Centroids: ', new_centroids)
+            centroids = new_centroids
+            return centroids, new_centroids, cluster_assigned_df
+        else:
+            centroids = new_centroids
             
-        # else:
-        #     cycle += 1
-        #     centroids = new_centroids
-        
-        # Make the new centroids the current centroids:
-        centroids = new_centroids
-
     return centroids, new_centroids, cluster_assigned_df
         
     
