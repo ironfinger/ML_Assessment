@@ -3,8 +3,6 @@ import numpy as np
 import pandas as pd
 import os
 
-from sklearn import cluster
-
 path = os.path.join('dog_breeds.csv')
 
 data = pd.read_csv(path)
@@ -28,6 +26,7 @@ def compute_euclidean_distance(vec_1, vec_2):
     return distance
 
 
+
 def initialise_centroids(dataset, k):
     # Get a numpy representation of the dataset:
     df_numpy = dataset.values
@@ -38,6 +37,7 @@ def initialise_centroids(dataset, k):
     centroids = dataset_temp[:k, :] # Retrieve the k nubmer of rows.
     #print('initialise_centroids', centroids)
     return centroids # Return the centroids.
+
 
 
 # This function assigns each row to a new cluster:
@@ -63,6 +63,7 @@ def assign_clusters(data_m, centroids):
     return cluster_assigned
 
 
+
 # This function creates the mean centroids to re-calculate the new clusters with:
 def compute_mean_centroids(cluster_assigned_df, centroids, k):
     new_centroids = np.zeros([k, len(centroids[0])]) # Create an empty array to store the new centroids.
@@ -80,7 +81,7 @@ def compute_mean_centroids(cluster_assigned_df, centroids, k):
         
         # Next I put the current centroid group into a numpy matrix:
         current_group_np = current_centroid.values
-        
+
         # Next we need to calcualte the mean centroid:
         for x, val in enumerate(centroid):
             # Get the current column in question:
@@ -93,32 +94,8 @@ def compute_mean_centroids(cluster_assigned_df, centroids, k):
             
     return new_centroids
         
-        
-    
-def kmeans(dataset, k):
-    # Step 01: Creation of variable K is done in method call.
-    
-    # Initialisation:
-    data_m = dataset.values # Store the entire dataset in a matrix.
-    cluster_assigned = np.zeros((len(data_m), 2)) # Stores the assigned cluster and the distance. 
-    
-    # Step 02: Randomly select 3 distinct centroids:
-    centroids = initialise_centroids(dataset=dataset, k=k)
-    
-    # Step 03 Measure the distance between each point and the centroids + Step 04: Assign each point to the nearest cluster:
-    cluster_assigned = assign_clusters(data_m=data_m, centroids=centroids)
-        
-    # Create a new df with the assigned cluster as a new column:
-    cluster_assigned_df = dataset.copy()
-    cluster_assigned_df['assigned_centroid'] = cluster_assigned[:, 1]
-    
-    # Step 05: Calculate the mean of each cluster as the new centroids:
-    new_centroids = compute_mean_centroids(cluster_assigned_df=cluster_assigned_df, centroids=centroids, k=k)
-        
-    return centroids, new_centroids, cluster_assigned_df
-
 """Does Convergence !!!!"""
-def kmeansV2(dataset, k):
+def kmeans(dataset, k):
     # Step 01: Creation of variable K is done in method call.
     
     # Initialisation:
@@ -166,20 +143,16 @@ def kmeansV2(dataset, k):
             print('Originals: ', centroids)
             print('New Centroids: ', new_centroids)
             centroids = new_centroids
-            return centroids, new_centroids, cluster_assigned_df
+            return centroids, new_centroids, cluster_assigned_df 
         else:
             centroids = new_centroids
             
     return centroids, new_centroids, cluster_assigned_df
-        
-    
-
 
 #%%
-centroids, mean_centroids, cluster_assigned_df = kmeansV2(dataset=data, k=2)
-
-
-
+centroids, mean_centroids, cluster_assigned_df = kmeans(dataset=data, k=2)
+print('The centroids: ', centroids)
+print('The mean centroids: ', mean_centroids)
 # %%
 
 # Time to plot the graphs:
@@ -187,6 +160,20 @@ k_means_1 = cluster_assigned_df[cluster_assigned_df['assigned_centroid'] == 0]
 k_means_2 = cluster_assigned_df[cluster_assigned_df['assigned_centroid'] == 1]
 
 import matplotlib.pyplot as plt
+
+# PLot the graph:
+
+# %%
+
+# The next step on the TODO list is to repeat the mean cluster setup with new centroids:
+# We can leave the kmean algorithm as it is but re-write the mean stuff into a new function which we can,
+# loop until convergence, or max number of iterations will be 10 for now.
+# If that works, then we can look at thinking abou the variance -> Not sure about this.
+# Then regress and evaluate.
+
+#------
+# Use two different values for K
+# a) The first plot is a scatter plot, where x axis is the "height" feature and y axis is the "tail length"
 
 # PLot the graph:
 
@@ -234,10 +221,60 @@ plt.scatter(
 
 plt.show()
 
+
+# b) The second plot is also a scatter plot, where x axis is the "height" fearture and y axis is the "leg length" feature; 
+#    As before use different colours to depict the data points from different clusters.
+plt.scatter(
+    k_means_1['height'],
+    k_means_1['leg length'],
+    color='blue'
+)
+
+# Plot the second group:
+plt.scatter(
+    k_means_2['height'],
+    k_means_2['leg length'],
+    color='red'
+)
+
+# Plot the first centroids height = [0] tail length = [1]:
+plt.scatter(
+    centroids[0, 0],
+    centroids[0, 2],
+    color='black'
+)
+
+# Plot the second centroid:
+plt.scatter(
+    centroids[1, 0],
+    centroids[1, 2],
+    color='black'
+)
+
+# Plot the first mean centroid:
+plt.scatter(
+    mean_centroids[0, 0],
+    mean_centroids[1, 2],
+    color='yellow'
+)
+
+# Plot the mean centroids:
+plt.scatter(
+    mean_centroids[1, 0],
+    mean_centroids[1, 2],
+    color='yellow'
+)
+
+plt.show()
+
+
+
+
+# c) The third plot is a line plot, where x axis is the "iteration step" and y axis is the 'object function value'.
+#    The plot should show and decreasing trend! You mumst plot the object function (error function) at each iteration when you trin the model.
+
+
+
 # %%
 
-# The next step on the TODO list is to repeat the mean cluster setup with new centroids:
-# We can leave the kmean algorithm as it is but re-write the mean stuff into a new function which we can,
-# loop until convergence, or max number of iterations will be 10 for now.
-# If that works, then we can look at thinking abou the variance -> Not sure about this.
-# Then regress and evaluate.
+# %%

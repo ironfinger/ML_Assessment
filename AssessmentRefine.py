@@ -29,15 +29,17 @@ def pol_regression(x, y, degree):
 
 def calculate_y(x, weights):
     total = 0
-    total += weights[0]
-
+    #total += weights[0]
     for i, weight in enumerate(weights):
-        if i == 0:
-            total += weight * (x ** i)
-        else:
-            val = weight * (x ** i)
-            total += val
-
+        
+        val = weight * (x ** i)
+        total += val
+        
+        # if i == 0:
+        #     total += weight * (x ** i)
+        # else:
+        #     val = weight * (x ** i)
+        #     total += val
     return total
 
 def plot_predictions(weights, features):
@@ -63,6 +65,9 @@ x_train = data_frame['x']
 y_train = data_frame['y']
 
 # Calculate the weights:
+#print('Degree 0') # INCLUDE THIS IN THE REPORT !!!
+#weights_degree0 = pol_regression(x_train, y_train, degree=0)
+
 weights_degree1 = pol_regression(x_train, y_train, degree=1)
 weights_degree2 = pol_regression(x_train, y_train, degree=2)
 weights_degree3 = pol_regression(x_train, y_train, degree=3)
@@ -70,6 +75,7 @@ weights_degree6 = pol_regression(x_train, y_train, degree=6)
 weights_degree10 = pol_regression(x_train, y_train, degree=10)
 
 # Calculate the Y(hat) predicted:
+
 y_hat1 = plot_predictions(weights=weights_degree1, features=[-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5])
 y_hat2 = plot_predictions(weights=weights_degree2, features=[-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5])
 y_hat3 = plot_predictions(weights=weights_degree3, features=[-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5])
@@ -124,6 +130,7 @@ RMSE_degree10 = eval_pol_regression(parameters=weights_degree10, x=y_train, y=y_
 
 errors_train = [RMSE_degree1, RMSE_degree2, RMSE_degree3, RMSE_degree6, RMSE_degree10]
 degrees = [1, 2, 3, 6, 10]
+print(errors_train)
 
 plt.plot(degrees, errors_train, color='red')
 plt.show()
@@ -144,6 +151,7 @@ RMSE_degree6 = eval_pol_regression(parameters=weights_degree6, x=y_test, y=y_hat
 RMSE_degree10 = eval_pol_regression(parameters=weights_degree10, x=y_test, y=y_hat10, degree=10)
 
 errors_test = [RMSE_degree1, RMSE_degree2, RMSE_degree3, RMSE_degree6, RMSE_degree10]
+print(errors_test)
 degrees = [1, 2, 3, 6, 10]
            
            
