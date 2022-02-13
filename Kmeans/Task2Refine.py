@@ -65,15 +65,16 @@ def kmeans(dataset, k):
         assigned_cluster = np.argmin(centroid_distances)
         
         cluster_assigned[v_index] = np.array([min_distance, assigned_cluster])
+    
         
     # Create a new df with the assigned cluster as a new column:
     cluster_assigned_df = dataset.copy()
     cluster_assigned_df['assigned_centroid'] = cluster_assigned[:, 1]
     
+    
     # Step 05: Calculate the mean of each cluster as the new centroids:
     new_centroids = np.zeros([k, len(centroids[0])]) # Create an empty array to store the new centroids.
     
-    print('mean centroids')
     for centroid_i, centroid in enumerate(centroids):
         
         # Copy the cluster assigned df to we don't make changes to both dataframes.
@@ -95,10 +96,16 @@ def kmeans(dataset, k):
         for x, val in enumerate(centroid):            
             # Get the currently column in question:
             current_column = current_group_np[:, x]
+            
+            # Calculate the mean of that column:
             mean = np.mean(current_column)
+            
+            # Input the mean of the new column into the new_mean centroids:
             new_centroids[centroid_i, x] = mean
         
+        
     return centroids, new_centroids, cluster_assigned_df
+
 
 #%%
 centroids, mean_centroids, cluster_assigned_df = kmeans(dataset=data, k=2)
@@ -161,8 +168,10 @@ plt.scatter(
 
 plt.show()
 
-
-
-
-
 # %%
+
+# The next step on the TODO list is to repeat the mean cluster setup with new centroids:
+# We can leave the kmean algorithm as it is but re-write the mean stuff into a new function which we can,
+# loop until convergence, or max number of iterations will be 10 for now.
+# If that works, then we can look at thinking abou the variance -> Not sure about this.
+# Then regress and evaluate.
