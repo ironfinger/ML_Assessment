@@ -50,9 +50,7 @@ def plot_predictions(weights, features):
     return y
 
 def eval_pol_regression(parameters, x, y, degree):
-    # X = actual feature.
-    # Y = y_hat
-    
+
     # First set is to compute the mean squared error:
     MSE = np.square(np.subtract(x, y)).mean()
     RMSE = np.sqrt(MSE)
@@ -159,3 +157,5 @@ plt.plot(degrees, errors_test, color='red')
 plt.show()
 
 # %%
+
+
